@@ -11,7 +11,8 @@ SPACE_PREFIX = "    "
 
 
 class _TreeGenerator:
-    def __init__(self, root_dir):
+    def __init__(self, root_dir, dir_only=False):
+        self._dir_only = dir_only
         self._root_dir = pathlib.Path(root_dir)
         self._tree = []
 
@@ -34,8 +35,7 @@ class _TreeGenerator:
         self._tree.append(f'{prefix}{connector} {file.name}')
 
     def _tree_body(self, directory, prefix=''):
-        branches = directory.iterdir()
-        branches = sorted(branches, key=lambda branch: branch.is_file())
+        branches = self._prepare_branches(directory)
         branches_count = len(branches)
         for index, branch in enumerate(branches):
             connector = ELBOW if index == branches_count - 1 else TEE
@@ -45,6 +45,14 @@ class _TreeGenerator:
                 )
             else:
                 self._add_file(connector=connector, file=branch, prefix=prefix)
+
+    def _prepare_branches(self, directory):
+        branches = directory.iterdir()
+        if self._dir_only:
+            branches = [branch for branch in branches if branch.is_dir()]
+            return branches
+        branches = sorted(branches, key=lambda branch: branch.is_file())
+        return branches
 
     def _tree_head(self):
         self._tree.append(f'{self._root_dir}{os.sep}')
@@ -56,8 +64,8 @@ class FolderTree:
 
     """
 
-    def __init__(self, root_dir):
-        self._generator = _TreeGenerator(root_dir)
+    def __init__(self, root_dir, dir_only=False):
+        self._generator = _TreeGenerator(root_dir, dir_only)
 
     def generate(self):
         tree = self._generator.build_tree()
