@@ -38,7 +38,7 @@ class _TreeGenerator:
         branches = sorted(branches, key=lambda branch: branch.is_file())
         branches_count = len(branches)
         for index, branch in enumerate(branches):
-            connector = ELBOW if index == branches_count -1 else TEE
+            connector = ELBOW if index == branches_count - 1 else TEE
             if branch.is_dir():
                 self._add_directory(
                     index=index, directory=branch, branches_count=branches_count, prefix=prefix, connector=connector
@@ -46,13 +46,12 @@ class _TreeGenerator:
             else:
                 self._add_file(connector=connector, file=branch, prefix=prefix)
 
-
     def _tree_head(self):
         self._tree.append(f'{self._root_dir}{os.sep}')
         self._tree.append(PIPE)
 
 
-class DirectoryTree:
+class FolderTree:
     """
 
     """
